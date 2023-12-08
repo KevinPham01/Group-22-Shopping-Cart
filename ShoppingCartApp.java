@@ -117,7 +117,7 @@ public class ShoppingCartApp {
         private DefaultTableModel tableModel;
         private JTable cartTable;
         private JComboBox<ProductItem> productsDropdown;
-        private Map<String, Double> productPrices;
+        private Map<String, ProductItem> availableProducts;
 
         public ShoppingCartPanel(String username) {
             setLayout(new BorderLayout());
@@ -141,6 +141,14 @@ public class ShoppingCartApp {
                 public void actionPerformed(ActionEvent e) {
                     int selectedRow = cartTable.getSelectedRow();
                     if (selectedRow != -1) {
+                        String productName = (String) tableModel.getValueAt(selectedRow, 0);
+                        int removedQuantity = (int) tableModel.getValueAt(selectedRow, 1);
+
+                        // Increment the available quantity in the store
+                        ProductItem product = availableProducts.get(productName);
+                        product.setQuantity(product.getQuantity() + removedQuantity);
+
+                        // Remove the row from the table
                         tableModel.removeRow(selectedRow);
                     } else {
                         JOptionPane.showMessageDialog(ShoppingCartPanel.this, "Please select a product to remove.");
@@ -163,38 +171,54 @@ public class ShoppingCartApp {
 
             add(controlPanel, BorderLayout.SOUTH);
 
-            productPrices = new HashMap<>();
-            productPrices.put("Orange", 1.99);
-            productPrices.put("Apple", 2.49);
-            productPrices.put("Pear", 1.79);
-            productPrices.put("Grape", 3.99);
-            productPrices.put("Lychee", 0.50);
-            productPrices.put("Dragon Fruit", 4.99);
-            productPrices.put("Longan", 2.49);
+            availableProducts = new HashMap<>();
+            availableProducts.put("Orange", new ProductItem("Orange", 1.99, "orange.jpg", 20));
+            availableProducts.put("Apple", new ProductItem("Apple", 2.49, "apple.jpg", 20));
+            availableProducts.put("Pear", new ProductItem("Pear", 1.79, "pear.jpg", 20));
+            availableProducts.put("Grape", new ProductItem("Grape", 3.99, "grape.jpg", 20));
+            availableProducts.put("Lychee", new ProductItem("Lychee", 0.50, "lychee.jpg", 20));
+            availableProducts.put("Dragon Fruit", new ProductItem("Dragon Fruit", 4.99, "dragon.jpg", 20));
+            availableProducts.put("Longan", new ProductItem("Longan", 2.49, "longan.jpg", 20));
         }
 
         public void addProductToCart(ProductItem product) {
             int rowIndex = findProductRowIndex(product.getName());
 
-            if (rowIndex == -1) {
+            if (rowIndex == -1 && product.getQuantity() > 0) {
+                // Decrease the available quantity
+                product.setQuantity(product.getQuantity() - 1);
+
                 double price = product.getPrice();
                 tableModel.addRow(new Object[] { product.getName(), 1, String.format("%.2f", price) });
-            } else {
+
+                updateProductAvailabilityLabel(product);
+            } else if (rowIndex != -1) {
                 int currentQuantity = (int) tableModel.getValueAt(rowIndex, 1);
                 int newQuantity = currentQuantity + 1;
 
-                double productPrice = productPrices.get(product.getName());
+                double productPrice = availableProducts.get(product.getName()).getPrice();
                 double newTotal = newQuantity * productPrice;
 
                 // Update the quantity and total amount with two decimal places
                 tableModel.setValueAt(newQuantity, rowIndex, 1);
                 tableModel.setValueAt(String.format("%.2f", newTotal), rowIndex, 2);
+
+                // Decrease the available quantity
+                product.setQuantity(product.getQuantity() - 1);
+
+                updateProductAvailabilityLabel(product);
+            } else {
+                JOptionPane.showMessageDialog(ShoppingCartPanel.this, "Product out of stock.");
             }
 
             int lastRow = tableModel.getRowCount() - 1;
             Rectangle rect = cartTable.getCellRect(lastRow, 0, true);
             cartTable.scrollRectToVisible(rect);
             cartTable.setRowSelectionInterval(lastRow, lastRow);
+
+            // Notify the user about the updated quantity
+            JOptionPane.showMessageDialog(ShoppingCartPanel.this,
+                    product.getName() + " added to the cart. Remaining quantity: " + product.getQuantity());
         }
 
         private int findProductRowIndex(String productName) {
@@ -211,7 +235,7 @@ public class ShoppingCartApp {
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 String productName = (String) tableModel.getValueAt(i, 0);
                 int quantity = (int) tableModel.getValueAt(i, 1);
-                double productPrice = productPrices.get(productName);
+                double productPrice = availableProducts.get(productName).getPrice();
                 totalAmount += productPrice * quantity;
             }
             return totalAmount;
@@ -243,6 +267,13 @@ public class ShoppingCartApp {
             checkoutDialog.add(panel);
             checkoutDialog.setVisible(true);
         }
+
+        private void updateProductAvailabilityLabel(ProductItem product) {
+            int availableQuantity = product.getQuantity();
+            String availabilityText = "Available: " + availableQuantity;
+            // Update the availability label for the corresponding product
+            // (you need to implement a way to associate components with products)
+        }
     }
 
     private static class HomePanel extends JPanel {
@@ -259,22 +290,24 @@ public class ShoppingCartApp {
             JPanel productPanel = new JPanel(new GridLayout(0, 3, 10, 10)); // 3 columns, adjust as needed
 
             ProductItem[] products = {
-                    new ProductItem("Orange", 1.99, "orange.jpg"),
-                    new ProductItem("Apple", 2.49, "apple.jpg"),
-                    new ProductItem("Pear", 1.79, "pear.jpg"),
-                    new ProductItem("Grape", 3.99, "grape.jpg"),
-                    new ProductItem("Lychee", 0.50, "lychee.jpg"),
-                    new ProductItem("Dragon Fruit", 3.99, "dragon.jpg"),
-                    new ProductItem("Longan", 2.49, "longan.jpg"),
-
+                    new ProductItem("Orange", 1.99, "orange.jpg", 20),
+                    new ProductItem("Apple", 2.49, "apple.jpg", 20),
+                    new ProductItem("Pear", 1.79, "pear.jpg", 20),
+                    new ProductItem("Grape", 3.99, "grape.jpg", 20),
+                    new ProductItem("Lychee", 0.50, "lychee.jpg", 20),
+                    new ProductItem("Dragon Fruit", 3.99, "dragon.jpg", 20),
+                    new ProductItem("Longan", 2.49, "longan.jpg", 20),
             };
 
             for (ProductItem product : products) {
                 JButton addToCartButton = new JButton("Add to Cart");
+                JLabel availabilityLabel = new JLabel("Available: " + product.getQuantity(), SwingConstants.CENTER);
+
                 addToCartButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         shoppingCartPanel.addProductToCart(product);
+                        availabilityLabel.setText("Available: " + product.getQuantity());
                     }
                 });
 
@@ -298,7 +331,8 @@ public class ShoppingCartApp {
                     productButtonPanel.add(productLabel);
 
                     JPanel buttonPanel = new JPanel(new BorderLayout());
-                    buttonPanel.add(addToCartButton, BorderLayout.SOUTH);
+                    buttonPanel.add(addToCartButton, BorderLayout.NORTH);
+                    buttonPanel.add(availabilityLabel, BorderLayout.SOUTH);
 
                     JPanel combinedPanel = new JPanel(new BorderLayout());
                     combinedPanel.add(productButtonPanel, BorderLayout.CENTER);
@@ -319,11 +353,13 @@ public class ShoppingCartApp {
         private String name;
         private double price;
         private String imagePath;
+        private int quantity;
 
-        public ProductItem(String name, double price, String imagePath) {
+        public ProductItem(String name, double price, String imagePath, int quantity) {
             this.name = name;
             this.price = price;
             this.imagePath = imagePath;
+            this.quantity = quantity;
         }
 
         public String getName() {
@@ -336,6 +372,14 @@ public class ShoppingCartApp {
 
         public String getImagePath() {
             return imagePath;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
         }
 
         @Override
