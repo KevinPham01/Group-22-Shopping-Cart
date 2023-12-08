@@ -2,7 +2,7 @@
 
 The ShoppingCartApp is a Java-based desktop application designed to simulate a shopping cart system. It is built using Java Swing for the graphical user interface. The application features a login system, a product catalog, and a shopping cart where users can add and remove items.
 
-#Features
+# Features
 
 Login System: Allows users to login to the application. The authentication is placeholder and should be replaced with actual logic.
 Product Catalog: Displays a range of products with their prices and availability. Users can add products to their shopping cart.
