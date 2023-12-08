@@ -28,7 +28,7 @@ public class ShoppingCartApp {
             tabbedPane.addTab("Login", loginPanel);
 
             add(tabbedPane);
- 
+
             setVisible(true);
         }
 
