@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShoppingCartApp {
-
     private static class MainFrame extends JFrame {
-
         private JTabbedPane tabbedPane;
         private LoginPanel loginPanel;
         private ShoppingCartPanel shoppingCartPanel;
@@ -60,12 +58,8 @@ public class ShoppingCartApp {
             this.mainFrame = mainFrame;
             setLayout(new BorderLayout());
 
-            JLabel titleLabel = new JLabel("Shopping Cart Application", SwingConstants.CENTER);
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-            add(titleLabel, BorderLayout.NORTH);
-
-            JPanel loginPanel = new JPanel(new GridLayout(3, 2, 5, 5));
-            loginPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+            JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
+            inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
             JLabel usernameLabel = new JLabel("Username:");
             JLabel passwordLabel = new JLabel("Password:");
@@ -73,8 +67,16 @@ public class ShoppingCartApp {
             usernameField = new JTextField();
             passwordField = new JPasswordField();
 
+            inputPanel.add(usernameLabel);
+            inputPanel.add(usernameField);
+            inputPanel.add(passwordLabel);
+            inputPanel.add(passwordField);
+
+            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton loginButton = new JButton("Login");
-            loginButton.setFont(new Font("Arial", Font.PLAIN, 16));
+            JButton cancelButton = new JButton("Cancel");
+            JButton selectAccountTypeButton = new JButton("Select Account Type");
+
             loginButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -89,8 +91,6 @@ public class ShoppingCartApp {
                 }
             });
 
-            JButton cancelButton = new JButton("Cancel");
-            cancelButton.setFont(new Font("Arial", Font.PLAIN, 16));
             cancelButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -98,18 +98,40 @@ public class ShoppingCartApp {
                 }
             });
 
-            loginPanel.add(usernameLabel);
-            loginPanel.add(usernameField);
-            loginPanel.add(passwordLabel);
-            loginPanel.add(passwordField);
-            loginPanel.add(loginButton);
-            loginPanel.add(cancelButton);
+            selectAccountTypeButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    showAccountTypeDialog();
+                }
+            });
 
-            add(loginPanel, BorderLayout.CENTER);
+            buttonPanel.add(loginButton);
+            buttonPanel.add(cancelButton);
+            buttonPanel.add(selectAccountTypeButton);
+
+            add(inputPanel, BorderLayout.CENTER);
+            add(buttonPanel, BorderLayout.SOUTH);
         }
 
         private boolean authenticate(String username, char[] password) {
-            return username.equals("1") && new String(password).equals("1");
+            // Placeholder authentication logic, replace with actual logic
+            return "1".equals(username) && "1".equals(String.valueOf(password));
+        }
+
+        private void showAccountTypeDialog() {
+            String[] options = { "Buyer", "Seller" };
+            int choice = JOptionPane.showOptionDialog(LoginPanel.this,
+                    "Select your account type:", "Account Type", JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
+
+            // Handle the chosen account type
+            if (choice == 0) {
+                // Buyer selected
+                // You can add buyer-specific logic here
+            } else if (choice == 1) {
+                // Seller selected
+                // You can add seller-specific logic here
+            }
         }
     }
 
