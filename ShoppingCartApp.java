@@ -6,7 +6,10 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 
+// Main class representing the Shopping Cart Application
 public class ShoppingCartApp {
+
+    // MainFrame class extends JFrame for the main application window
     private static class MainFrame extends JFrame {
         private JTabbedPane tabbedPane;
         private LoginPanel loginPanel;
@@ -32,6 +35,7 @@ public class ShoppingCartApp {
             setVisible(true);
         }
 
+        // Method to switch to the shopping cart view
         public void showShoppingCart(String username) {
             // Remove the login panel
             tabbedPane.remove(loginPanel);
@@ -49,6 +53,7 @@ public class ShoppingCartApp {
         }
     }
 
+    // LoginPanel class extends JPanel for the login functionality
     private static class LoginPanel extends JPanel {
         private JTextField usernameField;
         private JPasswordField passwordField;
@@ -58,6 +63,7 @@ public class ShoppingCartApp {
             this.mainFrame = mainFrame;
             setLayout(new BorderLayout());
 
+            // Input panel for username and password
             JPanel inputPanel = new JPanel(new GridLayout(2, 2, 5, 5));
             inputPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
 
@@ -72,11 +78,13 @@ public class ShoppingCartApp {
             inputPanel.add(passwordLabel);
             inputPanel.add(passwordField);
 
+            // Button panel for login, cancel, and account type selection
             JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton loginButton = new JButton("Login");
             JButton cancelButton = new JButton("Cancel");
             JButton selectAccountTypeButton = new JButton("Select Account Type");
 
+            // ActionListener for login button
             loginButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -91,6 +99,7 @@ public class ShoppingCartApp {
                 }
             });
 
+            // ActionListener for cancel button
             cancelButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -98,6 +107,7 @@ public class ShoppingCartApp {
                 }
             });
 
+            // ActionListener for account type selection button
             selectAccountTypeButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -113,11 +123,12 @@ public class ShoppingCartApp {
             add(buttonPanel, BorderLayout.SOUTH);
         }
 
+        // Placeholder authentication logic, replace with actual logic
         private boolean authenticate(String username, char[] password) {
-            // Placeholder authentication logic, replace with actual logic
             return "1".equals(username) && "1".equals(String.valueOf(password));
         }
 
+        // Method to show account type selection dialog
         private void showAccountTypeDialog() {
             String[] options = { "Buyer", "Seller" };
             int choice = JOptionPane.showOptionDialog(LoginPanel.this,
@@ -135,6 +146,7 @@ public class ShoppingCartApp {
         }
     }
 
+    // ShoppingCartPanel class extends JPanel for the shopping cart functionality
     private static class ShoppingCartPanel extends JPanel {
         private DefaultTableModel tableModel;
         private JTable cartTable;
@@ -144,10 +156,12 @@ public class ShoppingCartApp {
         public ShoppingCartPanel(String username) {
             setLayout(new BorderLayout());
 
+            // Title label for the shopping cart
             JLabel titleLabel = new JLabel("Your Shopping Cart", SwingConstants.CENTER);
             titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
             add(titleLabel, BorderLayout.NORTH);
 
+            // Table to display the shopping cart items
             tableModel = new DefaultTableModel(new Object[] { "Product", "Quantity", "Price" }, 0);
             cartTable = new JTable(tableModel);
             cartTable.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -157,6 +171,7 @@ public class ShoppingCartApp {
             JScrollPane scrollPane = new JScrollPane(cartTable);
             add(scrollPane, BorderLayout.CENTER);
 
+            // Buttons for removing product and checkout
             JButton removeProductButton = new JButton("Remove Product");
             removeProductButton.addActionListener(new ActionListener() {
                 @Override
@@ -187,12 +202,14 @@ public class ShoppingCartApp {
                 }
             });
 
+            // Panel for control buttons
             JPanel controlPanel = new JPanel(new FlowLayout());
             controlPanel.add(removeProductButton);
             controlPanel.add(checkoutButton);
 
             add(controlPanel, BorderLayout.SOUTH);
 
+            // Map to store available products with their quantities
             availableProducts = new HashMap<>();
             availableProducts.put("Orange", new ProductItem("Orange", 1.99, "orange.jpg", 20));
             availableProducts.put("Apple", new ProductItem("Apple", 2.49, "apple.jpg", 20));
@@ -203,6 +220,7 @@ public class ShoppingCartApp {
             availableProducts.put("Longan", new ProductItem("Longan", 2.49, "longan.jpg", 20));
         }
 
+        // Method to add a product to the shopping cart
         public void addProductToCart(ProductItem product) {
             int rowIndex = findProductRowIndex(product.getName());
 
@@ -243,6 +261,7 @@ public class ShoppingCartApp {
                     product.getName() + " added to the cart. Remaining quantity: " + product.getQuantity());
         }
 
+        // Method to find the row index of a product in the table
         private int findProductRowIndex(String productName) {
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 if (tableModel.getValueAt(i, 0).equals(productName)) {
@@ -252,6 +271,7 @@ public class ShoppingCartApp {
             return -1;
         }
 
+        // Method to calculate the total amount of the items in the shopping cart
         private double calculateTotalAmount() {
             double totalAmount = 0.0;
             for (int i = 0; i < tableModel.getRowCount(); i++) {
@@ -263,6 +283,7 @@ public class ShoppingCartApp {
             return totalAmount;
         }
 
+        // Method to show the checkout dialog
         private void showCheckoutDialog(String username, double totalAmount) {
             JDialog checkoutDialog = new JDialog((Frame) null, "Checkout", true);
             checkoutDialog.setSize(300, 150);
@@ -290,6 +311,7 @@ public class ShoppingCartApp {
             checkoutDialog.setVisible(true);
         }
 
+        // Method to update the availability label for a product
         private void updateProductAvailabilityLabel(ProductItem product) {
             int availableQuantity = product.getQuantity();
             String availabilityText = "Available: " + availableQuantity;
@@ -298,6 +320,7 @@ public class ShoppingCartApp {
         }
     }
 
+    // HomePanel class extends JPanel for the home view
     private static class HomePanel extends JPanel {
         private ShoppingCartPanel shoppingCartPanel;
 
@@ -305,10 +328,12 @@ public class ShoppingCartApp {
             this.shoppingCartPanel = shoppingCartPanel;
             setLayout(new BorderLayout());
 
+            // Title label for the home panel
             JLabel titleLabel = new JLabel("Shopping Application", SwingConstants.CENTER);
             titleLabel.setFont(new Font("Arial", Font.BOLD, 40));
             add(titleLabel, BorderLayout.NORTH);
 
+            // Panel to display products available for purchase
             JPanel productPanel = new JPanel(new GridLayout(0, 3, 10, 10)); // 3 columns, adjust as needed
 
             ProductItem[] products = {
@@ -344,38 +369,50 @@ public class ShoppingCartApp {
 
                     // Set a larger font size for the product label
                     Font productFont = new Font("Arial", Font.PLAIN, 20);
+
+                    // Create a JLabel for the product with HTML formatting to center text
                     JLabel productLabel = new JLabel("<html><center>" + product.getName() + "<br> $"
                             + String.format("%.2f", product.getPrice()) + "</center></html>", SwingConstants.CENTER);
-                    productLabel.setFont(productFont);
 
+                    // Create a JPanel for the product button and label with a vertical layout
                     JPanel productButtonPanel = new JPanel(new GridLayout(2, 1));
-                    productButtonPanel.add(imageLabel);
-                    productButtonPanel.add(productLabel);
+                    productButtonPanel.add(imageLabel); // Add the product image label to the panel
+                    productButtonPanel.add(productLabel); // Add the product label to the panel
 
+                    // Create a JPanel for buttons and availability label using a border layout
                     JPanel buttonPanel = new JPanel(new BorderLayout());
-                    buttonPanel.add(addToCartButton, BorderLayout.NORTH);
-                    buttonPanel.add(availabilityLabel, BorderLayout.SOUTH);
+                    buttonPanel.add(addToCartButton, BorderLayout.NORTH); // Add the "Add to Cart" button
+                    buttonPanel.add(availabilityLabel, BorderLayout.SOUTH); // Add the availability label
 
+                    // Create a combined panel with a border layout for the product and button
+                    // panels
                     JPanel combinedPanel = new JPanel(new BorderLayout());
-                    combinedPanel.add(productButtonPanel, BorderLayout.CENTER);
-                    combinedPanel.add(buttonPanel, BorderLayout.SOUTH);
+                    combinedPanel.add(productButtonPanel, BorderLayout.CENTER); // Add product button panel to the
+                                                                                // center
+                    combinedPanel.add(buttonPanel, BorderLayout.SOUTH); // Add button panel to the botto
 
-                    productPanel.add(combinedPanel);
+                    productPanel.add(combinedPanel); // Add the combined panel to the product panel
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    ex.printStackTrace(); // Print stack trace if an exception occurs
                 }
             }
 
+            // Create a scroll pane for the product panel
             JScrollPane productScrollPane = new JScrollPane(productPanel);
+            // Add the scroll pane to the main frame's center area
             add(productScrollPane, BorderLayout.CENTER);
         }
     }
 
+    // Definition of a ProductItem class representing a product in the shopping
+    // application
     private static class ProductItem {
         private String name;
         private double price;
         private String imagePath;
         private int quantity;
+
+        // Constructor to initialize a ProductItem object with the given parameters
 
         public ProductItem(String name, double price, String imagePath, int quantity) {
             this.name = name;
@@ -384,36 +421,44 @@ public class ShoppingCartApp {
             this.quantity = quantity;
         }
 
+        // Getter method for retrieving the name of the product
         public String getName() {
             return name;
         }
 
+        // Getter method for retrieving the price of the product
         public double getPrice() {
             return price;
         }
 
+        // Getter method for retrieving the image path of the product
         public String getImagePath() {
             return imagePath;
         }
 
+        // Getter method for retrieving the quantity of the product
         public int getQuantity() {
             return quantity;
         }
 
+        // Setter method for updating the quantity of the product
         public void setQuantity(int quantity) {
             this.quantity = quantity;
         }
 
+        // Override toString to provide a string representation of the product
         @Override
         public String toString() {
             return name + " - $" + String.format("%.2f", price);
         }
     }
 
+    // Main method to launch the shopping application using Swing
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
+                // Create a new instance of the MainFrame to start the application
                 new MainFrame();
             }
         });
